@@ -76,3 +76,25 @@ button {
 button:hover {
   background: #555;
 }
+
+.controls {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.controls button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+
+@media (max-width: 400px) {
+  .controls {
+    flex-direction: column;
+  }
+}

@@ -107,3 +107,9 @@ cells.forEach(cell =>
 );
 
 resetButton.addEventListener("click", resetGame);
+
+const backMenuBtn = document.getElementById("back-menu");
+
+backMenuBtn.addEventListener("click", () => {
+  window.location.href = "login.html";
+});
