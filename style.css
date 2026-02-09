@@ -17,6 +17,29 @@ h1 {
   margin-bottom: 20px;
 }
 
+
+.scoreboard {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 20px;
+}
+
+.score {
+  background: #222; 
+  color: white;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.player {
+  font-weight: bold;
+  font-size: 1.4rem;
+}
+
 .board {
   display: grid;
   grid-template-columns: repeat(3, 100px);

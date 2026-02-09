@@ -5,6 +5,12 @@ const resetButton = document.getElementById("reset");
 const params = new URLSearchParams(window.location.search);
 const gameMode = params.get("mode");
 
+const scoreXEl = document.getElementById("score-x");
+const scoreOEl = document.getElementById("score-o");
+
+let scoreX = 0;
+let scoreO = 0;
+
 let board = ["", "", "", "", "", "", "", "", ""];
 let currentPlayer = "X"; 
 let gameActive = true;
@@ -41,10 +47,18 @@ function checkResult() {
       board[a] === board[b] &&
       board[a] === board[c]
     ) {
-      gameActive = false;
-      setTimeout(() => alert(`${board[a]} wins!`), 100);
-      return;
-    }
+				gameActive = false;
+				if (board[a] === "X") {
+					scoreX++;
+					scoreXEl.textContent = scoreX;
+				} else {
+					scoreO++;
+					scoreOEl.textContent = scoreO;
+				}
+
+				setTimeout(() => alert(`${board[a]} wins!`), 100);
+				return;
+    	}
   }
 
   if (!board.includes("")) {
