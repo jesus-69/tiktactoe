@@ -1,8 +1,12 @@
 const cells = document.querySelectorAll(".cell");
 const resetButton = document.getElementById("reset");
 
+
+const params = new URLSearchParams(window.location.search);
+const gameMode = params.get("mode");
+
 let board = ["", "", "", "", "", "", "", "", ""];
-let currentPlayer = "X";
+let currentPlayer = "X"; 
 let gameActive = true;
 
 const winCombo = [
@@ -19,9 +23,7 @@ const winCombo = [
 function cellClick(e) {
   const index = e.target.dataset.index;
 
-  if (!gameActive || board[index] !== "") {
-    return;
-  }
+  if (!gameActive || board[index] !== "") return;
 
   board[index] = currentPlayer;
   e.target.textContent = currentPlayer;
@@ -30,6 +32,7 @@ function cellClick(e) {
 }
 
 function checkResult() {
+
   for (let combo of winCombo) {
     const [a, b, c] = combo;
 
@@ -52,14 +55,41 @@ function checkResult() {
 
 
   currentPlayer = currentPlayer === "X" ? "O" : "X";
+
+  if (gameMode === "bot" && currentPlayer === "O" && gameActive) {
+    setTimeout(botMove, 500);
+  }
+}
+
+function botMove() {
+  if (!gameActive) return;
+
+  // find empty cells
+  const emptyCells = [];
+  board.forEach((cell, index) => {
+    if (cell === "") emptyCells.push(index);
+  });
+
+  if (emptyCells.length === 0) return;
+
+  const randomIndex =
+    emptyCells[Math.floor(Math.random() * emptyCells.length)];
+
+  board[randomIndex] = "O";
+  cells[randomIndex].textContent = "O";
+
+  checkResult();
 }
 
 function resetGame() {
   board = ["", "", "", "", "", "", "", "", ""];
   currentPlayer = "X";
   gameActive = true;
-  cells.forEach(cell => cell.textContent = "");
+  cells.forEach(cell => (cell.textContent = ""));
 }
 
-cells.forEach(cell => cell.addEventListener("click", cellClick));
+cells.forEach(cell =>
+  cell.addEventListener("click", cellClick)
+);
+
 resetButton.addEventListener("click", resetGame);
