@@ -115,6 +115,6 @@ backMenuBtn.addEventListener("click", () => {
 
 function autoReset() {
   setTimeout(() => {
-    reset();
+    resetGame();
   }, 1200);
 }
