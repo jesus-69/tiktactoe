@@ -1,19 +1,20 @@
 const cells = document.querySelectorAll(".cell");
 const resetButton = document.getElementById("reset");
-
-
-const params = new URLSearchParams(window.location.search);
-const gameMode = params.get("mode");
+const backMenuBtn = document.getElementById("back-menu");
 
 const scoreXEl = document.getElementById("score-x");
 const scoreOEl = document.getElementById("score-o");
 
-let scoreX = 0;
-let scoreO = 0;
+
+const HUMAN = "X";
+const BOT = "O";
 
 let board = ["", "", "", "", "", "", "", "", ""];
-let currentPlayer = "X"; 
+let currentPlayer = HUMAN;
 let gameActive = true;
+
+let scoreX = 0;
+let scoreO = 0;
 
 const winCombo = [
   [0, 1, 2],
@@ -35,86 +36,124 @@ function cellClick(e) {
   e.target.textContent = currentPlayer;
 
   checkResult();
-}
 
-function checkResult() {
-
-  for (let combo of winCombo) {
-    const [a, b, c] = combo;
-
-    if (
-      board[a] &&
-      board[a] === board[b] &&
-      board[a] === board[c]
-    ) {
-				gameActive = false;
-        if (board[a] === "X") {
-          scoreX++;
-          scoreXEl.textContent = scoreX;
-        } else {
-          scoreO++;
-          scoreOEl.textContent = scoreO;
-        }
-        autoReset();
-        return;
-    	}
-  }
-
-  if (!board.includes("")) {
-    gameActive = false;
-    autoReset();
-    return;
-  }
-
-
-  currentPlayer = currentPlayer === "X" ? "O" : "X";
-
-  if (gameMode === "bot" && currentPlayer === "O" && gameActive) {
-    setTimeout(botMove, 500);
+  if (gameActive) {
+    currentPlayer = BOT;
+    setTimeout(botMove, 400);
   }
 }
 
 function botMove() {
   if (!gameActive) return;
 
-  // find empty cells
-  const emptyCells = [];
-  board.forEach((cell, index) => {
-    if (cell === "") emptyCells.push(index);
-  });
+  let bestScore = -Infinity;
+  let move;
 
-  if (emptyCells.length === 0) return;
+  for (let i = 0; i < board.length; i++) {
+    if (board[i] === "") {
+      board[i] = BOT;
+      let score = minimax(board, 0, false);
+      board[i] = "";
 
-  const randomIndex =
-    emptyCells[Math.floor(Math.random() * emptyCells.length)];
+      if (score > bestScore) {
+        bestScore = score;
+        move = i;
+      }
+    }
+  }
 
-  board[randomIndex] = "O";
-  cells[randomIndex].textContent = "O";
+  board[move] = BOT;
+  cells[move].textContent = BOT;
 
   checkResult();
+  currentPlayer = HUMAN;
+}
+
+function minimax(board, depth, isMaximizing) {
+  let result = checkWinner();
+  if (result !== null) return result;
+
+  if (isMaximizing) {
+    let bestScore = -Infinity;
+
+    for (let i = 0; i < board.length; i++) {
+      if (board[i] === "") {
+        board[i] = BOT;
+        let score = minimax(board, depth + 1, false);
+        board[i] = "";
+        bestScore = Math.max(score, bestScore);
+      }
+    }
+    return bestScore;
+  } else {
+    let bestScore = Infinity;
+
+    for (let i = 0; i < board.length; i++) {
+      if (board[i] === "") {
+        board[i] = HUMAN;
+        let score = minimax(board, depth + 1, true);
+        board[i] = "";
+        bestScore = Math.min(score, bestScore);
+      }
+    }
+    return bestScore;
+  }
+}
+
+function checkWinner() {
+  for (let combo of winCombo) {
+    const [a, b, c] = combo;
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+      return board[a] === BOT ? 1 : -1;
+    }
+  }
+
+  if (!board.includes("")) return 0;
+  return null;
+}
+
+function checkResult() {
+  for (let combo of winCombo) {
+    const [a, b, c] = combo;
+
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+      gameActive = false;
+
+      if (board[a] === HUMAN) {
+        scoreX++;
+        scoreXEl.textContent = scoreX;
+      } else {
+        scoreO++;
+        scoreOEl.textContent = scoreO;
+      }
+
+      autoReset();
+      return;
+    }
+  }
+
+  if (!board.includes("")) {
+    gameActive = false;
+    autoReset();
+  }
+}
+
+
+function autoReset() {
+  setTimeout(resetGame, 1200);
 }
 
 function resetGame() {
   board = ["", "", "", "", "", "", "", "", ""];
-  currentPlayer = "X";
   gameActive = true;
+  currentPlayer = HUMAN;
   cells.forEach(cell => (cell.textContent = ""));
 }
 
-cells.forEach(cell =>
-  cell.addEventListener("click", cellClick)
-);
 
+cells.forEach(cell => cell.addEventListener("click", cellClick));
 resetButton.addEventListener("click", resetGame);
-
-const backMenuBtn = document.getElementById("back-menu");
 
 backMenuBtn.addEventListener("click", () => {
   window.location.href = "login.html";
 });
-
-function autoReset() {
-  setTimeout(() => {
-    resetGame();
-  }, 1200);
-}
