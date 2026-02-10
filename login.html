@@ -12,15 +12,20 @@
     <p>Select Game Mode</p>
 
     <div class="modes">
-      <a href="index.html?mode=pvp" class="mode-btn">
-        🎮 Player vs Player
-      </a>
-
-      <a href="index.html?mode=bot" class="mode-btn">
-        🤖 Player vs Bot
-      </a>
+        <button class="mode-btn" onclick="startGame('pvp')">🎮 Player vs Player</button>
+        <button class="mode-btn" onclick="startGame('pvb')">🤖  Player vs Bot</button>
     </div>
   </div>
+
+  
+
+
+<script>
+  function startGame(mode) {
+    localStorage.setItem("gameMode", mode);
+    window.location.href = "index.html";
+  }
+</script>
 
 </body>
 </html>

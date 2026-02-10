@@ -1,3 +1,4 @@
+
 const cells = document.querySelectorAll(".cell");
 const resetButton = document.getElementById("reset");
 const backMenuBtn = document.getElementById("back-menu");
@@ -5,12 +6,12 @@ const backMenuBtn = document.getElementById("back-menu");
 const scoreXEl = document.getElementById("score-x");
 const scoreOEl = document.getElementById("score-o");
 
-
-const HUMAN = "X";
-const BOT = "O";
+const gameMode = localStorage.getItem("gameMode") || "pvp"; 
+const PLAYER_X = "X";
+const PLAYER_O = "O"; // Bot uses O in PVB
 
 let board = ["", "", "", "", "", "", "", "", ""];
-let currentPlayer = HUMAN;
+let currentPlayer = PLAYER_X;
 let gameActive = true;
 
 let scoreX = 0;
@@ -27,6 +28,7 @@ const winCombo = [
   [2, 4, 6]
 ];
 
+
 function cellClick(e) {
   const index = e.target.dataset.index;
 
@@ -36,23 +38,26 @@ function cellClick(e) {
   e.target.textContent = currentPlayer;
 
   checkResult();
+  if (!gameActive) return;
 
-  if (gameActive) {
-    currentPlayer = BOT;
+  if (gameMode === "pvb") {
+    currentPlayer = PLAYER_O;
     setTimeout(botMove, 400);
+  } else {
+    currentPlayer = currentPlayer === PLAYER_X ? PLAYER_O : PLAYER_X;
   }
 }
 
 function botMove() {
-  if (!gameActive) return;
+  if (!gameActive || gameMode !== "pvb") return;
 
   let bestScore = -Infinity;
   let move;
 
   for (let i = 0; i < board.length; i++) {
     if (board[i] === "") {
-      board[i] = BOT;
-      let score = minimax(board, 0, false);
+      board[i] = PLAYER_O;
+      let score = minimax(board, false);
       board[i] = "";
 
       if (score > bestScore) {
@@ -62,24 +67,24 @@ function botMove() {
     }
   }
 
-  board[move] = BOT;
-  cells[move].textContent = BOT;
+  board[move] = PLAYER_O;
+  cells[move].textContent = PLAYER_O;
 
   checkResult();
-  currentPlayer = HUMAN;
+  currentPlayer = PLAYER_X;
 }
 
-function minimax(board, depth, isMaximizing) {
+
+function minimax(board, isMaximizing) {
   let result = checkWinner();
   if (result !== null) return result;
 
   if (isMaximizing) {
     let bestScore = -Infinity;
-
-    for (let i = 0; i < board.length; i++) {
+    for (let i = 0; i < 9; i++) {
       if (board[i] === "") {
-        board[i] = BOT;
-        let score = minimax(board, depth + 1, false);
+        board[i] = PLAYER_O;
+        let score = minimax(board, false);
         board[i] = "";
         bestScore = Math.max(score, bestScore);
       }
@@ -87,11 +92,10 @@ function minimax(board, depth, isMaximizing) {
     return bestScore;
   } else {
     let bestScore = Infinity;
-
-    for (let i = 0; i < board.length; i++) {
+    for (let i = 0; i < 9; i++) {
       if (board[i] === "") {
-        board[i] = HUMAN;
-        let score = minimax(board, depth + 1, true);
+        board[i] = PLAYER_X;
+        let score = minimax(board, true);
         board[i] = "";
         bestScore = Math.min(score, bestScore);
       }
@@ -101,25 +105,20 @@ function minimax(board, depth, isMaximizing) {
 }
 
 function checkWinner() {
-  for (let combo of winCombo) {
-    const [a, b, c] = combo;
+  for (let [a, b, c] of winCombo) {
     if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      return board[a] === BOT ? 1 : -1;
+      return board[a] === PLAYER_O ? 1 : -1;
     }
   }
-
-  if (!board.includes("")) return 0;
-  return null;
+  return board.includes("") ? null : 0;
 }
 
 function checkResult() {
-  for (let combo of winCombo) {
-    const [a, b, c] = combo;
-
+  for (let [a, b, c] of winCombo) {
     if (board[a] && board[a] === board[b] && board[a] === board[c]) {
       gameActive = false;
 
-      if (board[a] === HUMAN) {
+      if (board[a] === PLAYER_X) {
         scoreX++;
         scoreXEl.textContent = scoreX;
       } else {
@@ -138,19 +137,17 @@ function checkResult() {
   }
 }
 
-
 function autoReset() {
   setTimeout(resetGame, 1200);
 }
 
 function resetGame() {
   board = ["", "", "", "", "", "", "", "", ""];
+  currentPlayer = PLAYER_X;
   gameActive = true;
-  currentPlayer = HUMAN;
   cells.forEach(cell => (cell.textContent = ""));
 }
-
-
+  
 cells.forEach(cell => cell.addEventListener("click", cellClick));
 resetButton.addEventListener("click", resetGame);
 
