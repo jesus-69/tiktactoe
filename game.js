@@ -48,22 +48,21 @@ function checkResult() {
       board[a] === board[c]
     ) {
 				gameActive = false;
-				if (board[a] === "X") {
-					scoreX++;
-					scoreXEl.textContent = scoreX;
-				} else {
-					scoreO++;
-					scoreOEl.textContent = scoreO;
-				}
-
-				setTimeout(() => alert(`${board[a]} wins!`), 100);
-				return;
+        if (board[a] === "X") {
+          scoreX++;
+          scoreXEl.textContent = scoreX;
+        } else {
+          scoreO++;
+          scoreOEl.textContent = scoreO;
+        }
+        autoReset();
+        return;
     	}
   }
 
   if (!board.includes("")) {
     gameActive = false;
-    setTimeout(() => alert("It's a draw!"), 100);
+    autoReset();
     return;
   }
 
@@ -113,3 +112,9 @@ const backMenuBtn = document.getElementById("back-menu");
 backMenuBtn.addEventListener("click", () => {
   window.location.href = "login.html";
 });
+
+function autoReset() {
+  setTimeout(() => {
+    reset();
+  }, 1200);
+}
