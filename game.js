@@ -8,7 +8,7 @@ const scoreOEl = document.getElementById("score-o");
 
 const gameMode = localStorage.getItem("gameMode") || "pvp"; 
 const PLAYER_X = "X";
-const PLAYER_O = "O"; // Bot uses O in PVB
+const PLAYER_O = "O";
 
 let board = ["", "", "", "", "", "", "", "", ""];
 let currentPlayer = PLAYER_X;
@@ -147,7 +147,7 @@ function resetGame() {
   gameActive = true;
   cells.forEach(cell => (cell.textContent = ""));
 }
-  
+
 cells.forEach(cell => cell.addEventListener("click", cellClick));
 resetButton.addEventListener("click", resetGame);
 
